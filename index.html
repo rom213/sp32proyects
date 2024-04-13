@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 Web Server</title>
+  <!----------------------------- CSS ----------------------------->
+  <style>
+    body {
+      text-align: center;
+      font-family: "Calibri", sans-serif;
+      background-color: rgba(0, 3, 8, 0.26);
+    }
+
+    h1 {
+      color: rgba(0, 0, 255, 0.87);
+      font-size: 50px;
+    }
+
+    #btn,
+    #btn2 {
+      display: inline-block;
+      text-decoration: none;
+      background: #8CD460;
+      color: rgba(255, 255, 255, 0.80);
+      font-weight: bold;
+      font-size: 20px;
+      /* Fixed the font property */
+      width: 150px;
+      height: 150px;
+      line-height: 150px;
+      border-radius: 50%;
+      text-align: center;
+      vertical-align: middle;
+      overflow: hidden;
+      box-shadow: 0px 0px 0px 8px #8CD460;
+      border: solid 2px rgba(255, 255, 255, 0.47);
+      transition: 0.5s;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>E S P 3 2<br>WebSocket Server</h1>
+  <a href="#" id="btn" onclick="button()"> </a>
+  <a href="#" id="btn2" onclick="button2()"> </a>
+
+  <!-------------------------- JavaScript ------------------------>
+  <script>
+    var websock; // Declare websock in the global scope
+
+    InitWebSocket();
+
+    function InitWebSocket() {
+      websock = new WebSocket('ws://192.168.0.133:81/ws'); // Eliminar 'const' para asignar a la variable global
+
+      websock.onmessage = function (evt) {
+        var JSONobj = JSON.parse(evt.data);
+
+        updateButton('btn', JSONobj.LEDonoff);
+        updateButton('btn2', JSONobj.LEDonoff2);
+      };
+    }
+
+
+    function updateButton(buttonId, state) {
+      var button = document.getElementById(buttonId);
+      button.innerHTML = state;
+
+      if (state === 'ON') {
+        button.style.background = '#FF0000';
+        button.style.boxShadow = '0px 0px 0px 8px #FF0000';
+      } else {
+        button.style.background = '#111111';
+        button.style.boxShadow = '0px 0px 0px 8px #111111';
+      }
+    }
+
+    function button() {
+      var btn = 'LEDonoff=ON';
+      if (document.getElementById('btn').innerHTML === 'ON') {
+        btn = 'LEDonoff=OFF';
+      }
+      websock.send(btn);
+    }
+
+    function button2() {
+      var btn = 'LEDonoff2=ON';
+      if (document.getElementById('btn2').innerHTML === 'ON') {
+        btn = 'LEDonoff2=OFF';
+      }
+      websock.send(btn);
+    }
+  </script>
+
+</body>
+
+</html>
